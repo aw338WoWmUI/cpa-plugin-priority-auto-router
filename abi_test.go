@@ -57,7 +57,7 @@ func TestABIRegisterAllowsInstallOnlyConfigAndLeavesRoutingUnhandled(t *testing.
 	if got.SchemaVersion != pluginabi.SchemaVersion {
 		t.Fatalf("SchemaVersion = %d, want %d", got.SchemaVersion, pluginabi.SchemaVersion)
 	}
-	if got.Metadata.Name != pluginName || got.Metadata.GitHubRepository != "https://github.com/Apparux/cpa-plugin-priority-auto-router" {
+	if got.Metadata.Name != pluginName || got.Metadata.GitHubRepository != "https://github.com/aw338WoWmUI/cpa-plugin-priority-auto-router" {
 		t.Fatalf("Metadata = %#v", got.Metadata)
 	}
 	if !got.Capabilities.ModelRouter || !got.Capabilities.Executor {

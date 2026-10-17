@@ -28,7 +28,12 @@ jobs:
           cache: true
 
       - name: Test
-        run: go test ./...
+        run: go test -race ./...
+
+      - name: Concurrent C ABI streams and shutdown
+        run: |
+          make build BUILD_DIR=dist/abi-test
+          python3 scripts/test_abi_concurrency.py "$PWD/dist/abi-test/priority-auto-router.so"
 
       - name: Vet
         run: go vet ./...

@@ -1,5 +1,22 @@
 # CPA Priority Auto Router Plugin
 
+This fork of [Apparux's plugin](https://github.com/Apparux/cpa-plugin-priority-auto-router)
+keeps the plugin ID and configuration compatible. Release `0.1.3-aw338.1` fixes a
+global lock held across blocking host callbacks: one stalled upstream stream can
+otherwise block unrelated requests and reconfiguration. Existing in-flight call
+tracking keeps the host alive until stream callbacks and buffer frees finish.
+
+The compiled-ABI regression holds one real host callback open while checking that
+another stream and reconfiguration complete. It also checks shutdown drains the
+stalled stream and frees host buffers. Run it after `make build`:
+
+```bash
+python3 scripts/test_abi_concurrency.py "$PWD/priority-auto-router.so"
+```
+
+Use `.dylib` instead on Apple Silicon macOS. The regression harness is validated
+on Linux amd64 and macOS arm64; other platforms retain the upstream build jobs.
+
 `priority-auto-router` is an independent CLIProxyAPI (CPA) dynamic-library plugin that lets clients request one model alias, usually `code`, while CPA routes the request through prioritized provider candidates and fallback rules.
 
 The plugin uses CPA `model_router`, `executor`, and `host.model.*` callbacks. It does not make direct upstream HTTP calls and does not read API keys, OAuth tokens, or local OAuth JSON files.

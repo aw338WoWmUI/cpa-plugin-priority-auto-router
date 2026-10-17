@@ -1,5 +1,5 @@
 PLUGIN_NAME ?= priority-auto-router
-VERSION ?= 0.1.2
+VERSION ?= 0.1.3-aw338.1
 BUILD_DIR ?= .
 GOOS ?= $(shell go env GOOS)
 GOARCH ?= $(shell go env GOARCH)

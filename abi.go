@@ -333,10 +333,12 @@ func callHost(method string, payload any) (json.RawMessage, error) {
 	}
 
 	priorityAutoRouterABIState.RLock()
-	defer priorityAutoRouterABIState.RUnlock()
-	if priorityAutoRouterABIState.host == nil {
+	host := priorityAutoRouterABIState.host
+	priorityAutoRouterABIState.RUnlock()
+	if host == nil {
 		return nil, fmt.Errorf("host callback is unavailable")
 	}
+	// ABI calls and stream workers hold inFlight until callbacks and buffer frees finish.
 
 	cMethod := C.CString(method)
 	defer C.free(unsafe.Pointer(cMethod))
@@ -352,7 +354,7 @@ func callHost(method string, payload any) (json.RawMessage, error) {
 
 	var response C.cliproxy_buffer
 	rc := C.priority_auto_router_call_host(
-		priorityAutoRouterABIState.host,
+		host,
 		cMethod,
 		(*C.uint8_t)(cPayload),
 		C.size_t(len(rawPayload)),
@@ -363,7 +365,7 @@ func callHost(method string, payload any) (json.RawMessage, error) {
 		rawResponse = C.GoBytes(response.ptr, C.int(response.len))
 	}
 	if response.ptr != nil {
-		C.priority_auto_router_free_host_buffer(priorityAutoRouterABIState.host, response.ptr, response.len)
+		C.priority_auto_router_free_host_buffer(host, response.ptr, response.len)
 	}
 	if len(rawResponse) == 0 {
 		return nil, fmt.Errorf("host callback %s returned no response, code=%d", method, int(rc))
